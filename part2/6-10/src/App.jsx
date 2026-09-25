@@ -4,7 +4,7 @@ import Numbers from './components/Numbers'
 import Filter from './components/Filter'
 import ContactServices from './components/ContactServices'
 
-const baseUrl = 'http://localhost:3001/api/persons'
+const baseUrl = '/api/persons'
 
 function App() {
   const [persons, setPersons] = useState([])

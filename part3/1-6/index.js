@@ -6,6 +6,7 @@ const app = express()
 
 // middleware
 app.use(cors())
+app.use(express.static('dist'))   // Express will first check the 'dist' directory (added from the npm run build on the front end of the app) for a file corresponding to an HTTP GET rquest's address 
 app.use(express.json())
 app.use(morgan(function (tokens, req, res) {
   return [
