@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import ContactForm from './components/ContactForm'
 import Numbers from './components/Numbers'
 import Filter from './components/Filter'
+import ContactServices from './components/ContactServices'
+
+const baseUrl = 'http://localhost:3001/api/persons'
 
 function App() {
   const [persons, setPersons] = useState([])
@@ -12,12 +14,10 @@ function App() {
 
   useEffect(() => {
     console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
+    ContactServices
+    .GetContacts(baseUrl).then(response => {
         console.log('Promise fulfilled')
-        setPersons(response.data) 
-      })
+        setPersons(response.data) })
   }, [])
   console.log('render', persons.length, 'contacts')
 
@@ -41,13 +41,24 @@ function App() {
     const nameObj = { name: newName, number: newNumber }
     const names = persons.map(person => person.name)
     if (names.indexOf(newName) === -1) {
+      ContactServices
+        .PostContact(baseUrl, nameObj)
+        .then(response => nameObj.id = response.data.id)  // Need to wait for promise to be fulfilled to get the response data and tell us what is the id that the server gave this object, then we save this id to the contact that is add to the persons in state
+      console.log(nameObj)
       setPersons(persons.concat(nameObj))
       setNewName('')
       setNewNumber('')
     } else {
       alert(`${newName} is already added to phonebook`)
     }
+  }
 
+  const delContact = (id) => {
+    const urlwid = baseUrl+`/${id}`
+    console.log(urlwid)
+    ContactServices
+      .DeleteContact(urlwid)
+      .then(response => setPersons(persons.filter(person => person.id !== id)))
   }
 
   return (
@@ -59,7 +70,7 @@ function App() {
       <ContactForm name={newName} number={newNumber} nameChange={handleNameChange} numberChange={handleNumberChange} click={addName} />
 
       <h2>Numbers</h2>
-      <Numbers persons={persons} filter={filter}/>
+      <Numbers persons={persons} filter={filter} delContact={delContact}/>
     </div>
   )
 }
